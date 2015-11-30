@@ -1,22 +1,91 @@
 #include "graj.h"
 
 class Gracz1 : public Gracz {
-	std::random_device _rd;
-
-	std::mt19937 _gen;
-
-	std::uniform_int_distribution<> _dis;
+//	std::random_device _rd;
+//
+//	std::mt19937 _gen;
+//
+//	std::uniform_int_distribution<> _dis;
+//
+//public:
+//	Gracz1() : _gen( _rd() ), _dis( 0, 2 ) {
+//
+//	}
+//
+//	virtual Ruch ruch( Ruch poprzedniRuchPrzeciwnika ) {
+//		return Ruch( _dis( _gen ) );
+//	}
+//	void przedstawSie() {
+//		std::cout << "Szymon Palka";
+//	}
+//	void reset() {
+//
+//	}
+	int dawny = rand() % 3;
+	int bardzoDawny = rand() % 3;
+	int mojdawny = rand() % 3;
+	int lotto = rand() % 3;
 
 public:
-	Gracz1() : _gen( _rd() ), _dis( 0, 2 ) {
+	Gracz1() {
+		dawny;
+		bardzoDawny;
+		mojdawny;
+		lotto;
 
 	}
 
 	virtual Ruch ruch( Ruch poprzedniRuchPrzeciwnika ) {
-		return Ruch( _dis( _gen ) );
+		int bardzoDawny = dawny;
+		dawny = poprzedniRuchPrzeciwnika;
+		if( dawny == lotto ) {
+			mojdawny = rand() % 3;
+		}
+		if( dawny == 0 ) {
+			if( bardzoDawny == 0 ) {
+				mojdawny = 1;
+			}
+			else {
+				if( mojdawny == 2 )
+					mojdawny = 0;
+				if( mojdawny == 0 )
+					mojdawny = 2;
+				if( mojdawny == 1 )
+					mojdawny = 2;
+			}
+		}
+		if( dawny == 1 ) {
+			if( bardzoDawny == 1 ) {
+				mojdawny = 2;
+			}
+			else {
+				if( mojdawny == 2 )
+					mojdawny = 0;
+				if( mojdawny == 0 )
+					mojdawny = 1;
+				if( mojdawny == 1 )
+					mojdawny = 0;
+			}
+		}
+		if( dawny == 2 ) {
+			if( bardzoDawny == 2 ) {
+				mojdawny = 0;
+			}
+			else {
+				if( mojdawny == 2 )
+					mojdawny = 1;
+				if( mojdawny == 0 )
+					mojdawny = 1;
+				if( mojdawny == 1 )
+					mojdawny = 2;
+			}
+		}
+		lotto = rand() % 3;
+		return Ruch( mojdawny );
+
 	}
 	void przedstawSie() {
-		std::cout << "Szymon Palka";
+		std::cout << "Grzegorz Sarapata";
 	}
 	void reset() {
 
@@ -33,7 +102,7 @@ public:
 	}
 	virtual Ruch ruch( Ruch poprzedniRuchPrzeciwnika ) {
 		// nie chcialem castowac
-		if( _licznik == 0 ) {
+		/*if( _licznik == 0 ) {
 			_licznik++;
 			return Ruch::Papier;
 		}
@@ -44,7 +113,8 @@ public:
 		if( _licznik == 2 ) {
 			_licznik = 0;
 			return Ruch::Kamien;
-		}
+		}*/
+		return poprzedniRuchPrzeciwnika;
 	}
 	void reset() {
 
@@ -56,7 +126,7 @@ public:
 
 int main() {
 
-	Gracz2 gracz1;
+	Gracz1 gracz1;
 	Gracz3 gracz2;
 	Gra gra( gracz1, gracz2 );
 	gra.graj();

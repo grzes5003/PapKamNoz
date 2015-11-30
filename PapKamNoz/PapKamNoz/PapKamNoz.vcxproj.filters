@@ -27,6 +27,9 @@
     <ClCompile Include="graj.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="pomoc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="graj.h">

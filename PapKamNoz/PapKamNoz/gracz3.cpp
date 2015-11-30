@@ -10,7 +10,17 @@ Gracz3::~Gracz3() {
 }
 
 void Gracz3::reset() {
-
+	limiter_szesciu = 1;
+	inteligent = false;
+	zmienny_inteligent = false;
+	wygr.ja = 0;
+	wygr.on = 0;
+	wygr.wygrana_tab.clear();
+	numer_podpuszczacza = 1;
+	kiedy_badanie = 0;
+	ruchy.clear();
+	poczatkowe_ruchy.clear();
+	moje_ruchy.clear();
 }
 
 float Gracz3::win_ratio() {
@@ -54,8 +64,8 @@ Ruch Gracz3::podpuszczacz( int numer ) {
 		}
 		else {
 			inteligent = false;
-			return Kamien;
 		}
+		_return = Nozyce;
 		break;
 	case 8:
 		if( ruchy.at( 3 ) == Nozyce ) {
@@ -64,6 +74,7 @@ Ruch Gracz3::podpuszczacz( int numer ) {
 		else {
 			zmienny_inteligent = false;
 		}
+		_return = Nozyce;
 		break;
 	default:
 		std::cerr << "error podpuszczacz out of range";
@@ -83,7 +94,7 @@ Ruch Gracz3::statystyka( int ile ) {
 
 	staty ja;
 
-	std::vector<Ruch> *wsk = &ruchy;
+	std::vector<Ruch> *wsk = &moje_ruchy;
 
 	std::vector<Ruch>::iterator it1 = wsk->end() - ile;
 	std::vector<Ruch>::iterator it2 = wsk->end();
@@ -91,8 +102,6 @@ Ruch Gracz3::statystyka( int ile ) {
 	ja.ile_Pap = std::count( it1, it2, 0 );
 	ja.ile_Noz = std::count( it1, it2, 1 );
 	ja.ile_Kam = std::count( it1, it2, 2 );
-
-	wsk = &moje_ruchy;
 
 	staty on;
 
@@ -370,58 +379,39 @@ int Gracz3::analizer_up( std::vector<Ruch> potyczki, int ile_ostatnich ) {
 Ruch Gracz3::ruch( Ruch stary_ruch ) {
 	Ruch _return;
 
-	//czy inteligent
-
-	if( limiter_szesciu >= 1 && limiter_szesciu <= 9 ) {
+	if( limiter_szesciu >= 1 && limiter_szesciu < 9 ) {
 		_return = podpuszczacz( numer_podpuszczacza );
 	}
 
+	//---------------------zapis danych
 
-	if( limiter_szesciu >= 4 ) { //zapisuj ruchy
-
-
-								 //badanie okresu -> brak okresu;
-		if( limiter_szesciu > 20 ) {
-			if( analizer_up( ruchy, 16 ) == -1 ) {
-				if( limiter_szesciu <= 50 )
-					_return = statystyka( limiter_szesciu - 10 );
-				else
-					_return = statystyka( 40 );
-			}
-			else if( analizer_up( ruchy, 16 ) >0 ) {
-				_return = kontrator( jaki_ruch_okresu( ruchy, 16, analizer_up( ruchy, 16 ) ) );
-			}
+	//---------------------zaczyna docelowy alg--------------------//
+	if( limiter_szesciu > 20 ) {
+		jego_okres.push_back( analizer_up( ruchy, 12 ) );
+		if( win_ratio() < 0.75 && kiedy_badanie > static_cast<int>(1000 /( kiedy_badanie + 1) && limiter_szesciu > 50 ) ) {
+			_return = podpuszczacz( numer_podpuszczacza );
 		}
-		else if( limiter_szesciu > 8 ) {
-			if( analizer_up( ruchy, ruchy.size() ) == -1 ) {
-				_return = statystyka( ruchy.size() );
-			}
-			else if( analizer_up( ruchy, ruchy.size() ) >0 ) {
-				_return = kontrator( jaki_ruch_okresu( ruchy, ruchy.size(), analizer_up( ruchy, ruchy.size() ) ) );
-			}
+		else if( analizer_up( ruchy, 12 ) == -1 ) {//brak schematu
+			_return = kontrator( statystyka( limiter_szesciu - 20 ));
 		}
-		//jesli wygrywa za duzo
-		if( limiter_szesciu > 50 ) {
-			if( win_ratio() < 0.75 && limiter_szesciu > 50 && kiedy_badanie > int( 10000 / limiter_szesciu ) ) { //pewnie do zmiany, z liczba zagran 
-				podpuszczacz( numer_podpuszczacza );
-			}
+		else if( analizer_up( ruchy, 12 ) > 0 ) {//jakis okres
+			_return = kontrator( jaki_ruch_okresu( ruchy, 12, analizer_up( ruchy, 12 ) ) );
+		}
+	}
+	else if( limiter_szesciu >8 && limiter_szesciu < 21) {
+		jego_okres.push_back( analizer_up( ruchy, 12 ) );
+		if( analizer_up( ruchy, ruchy.size() ) == -1 ) {
+			_return = statystyka( ruchy.size() );
+		}
+		else {
+			_return = kontrator( jaki_ruch_okresu( ruchy, ruchy.size(), analizer_up( ruchy, ruchy.size() ) ) );
 		}
 	}
 
-	kiedy_badanie++;
-
-	if( numer_podpuszczacza >= 9 ) {
-		kiedy_badanie = 0;
-		numer_podpuszczacza = 1;
-	}
-
-	if( limiter_szesciu >= 4 ) { //update tablic z ruchami
+	if( limiter_szesciu > 3 ) {
 		ruchy.push_back( stary_ruch );
 		moje_ruchy.push_back( _return );
-
-		if( limiter_szesciu >= 5 ) {
-
-
+		if( limiter_szesciu > 4 ) {
 			if( czy_wygralem( moje_ruchy, ruchy, ruchy.size() - 1 ) ) {
 				wygr.ja++;
 				wygr.wygrana_tab.push_back( 1 );
@@ -431,9 +421,6 @@ Ruch Gracz3::ruch( Ruch stary_ruch ) {
 				wygr.wygrana_tab.push_back( 0 );
 			}
 		}
-	}
-	if( limiter_szesciu == 99 ) {
-		//std::cout << "lol";
 	}
 
 	limiter_szesciu++;

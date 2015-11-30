@@ -19,9 +19,6 @@ class Gracz3 : public Gracz
 	bool inteligent = false;
 	bool zmienny_inteligent = false;
 
-	//enum Metoda {stala, co_2, co_3, rand, nope};
-	//Metoda metoda;'
-
 	Ruch podpuszczacz( int numer );
 	int numer_podpuszczacza = 1; //jedynkuj!!!	
 	int kiedy_badanie = 0;
@@ -32,10 +29,11 @@ class Gracz3 : public Gracz
 
 	std::vector<Ruch> poczatkowe_ruchy;
 	std::vector<Ruch> ruchy;
-
+	std::vector<Ruch> moje_ruchy;
+	std::vector<int> jego_okres;
 
 	bool czy_wygralem( std::vector<Ruch> ja, std::vector<Ruch> on, int kiedy );
-	std::vector<Ruch> moje_ruchy;
+	
 public:
 
 	int analizer_up( std::vector<Ruch> potyczki, int ile_ostatnich );
