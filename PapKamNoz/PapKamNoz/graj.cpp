@@ -12,7 +12,7 @@ void Gra::graj() {
 
 	Ruch staryRuch1 = Papier;
 	Ruch staryRuch2 = Papier;
-	for( int pojedynek = 0; pojedynek < 10; pojedynek++ ) {
+	for( int pojedynek = 0; pojedynek < 1; pojedynek++ ) {
 		for( int i = 0; i < 100; i++ ) {
 			Ruch ruch1 = _gracz1.ruch( staryRuch2 );
 			Ruch ruch2 = _gracz2.ruch( staryRuch1 );
@@ -38,6 +38,6 @@ void Gra::graj() {
 
 void Gra::zeruj() {
 	_ktoWygralPojedynek[0] = _ktoWygralPojedynek[1] = _ktoWygralPojedynek[2] = 0;
-	_gracz1.reset();
-	_gracz2.reset();
+	//_gracz1.reset();
+	//_gracz2.reset();
 }

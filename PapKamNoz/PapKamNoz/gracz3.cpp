@@ -1,9 +1,10 @@
 #include "gracz3.h"
 
-		Gracz3::Gracz3() {
+Gracz3::Gracz3() {
+	moje_ruchy.push_back( Papier );
 		wygr.ja = 0;
 		wygr.on = 0;
-	}
+}
 
 Gracz3::~Gracz3() {
 	//dtor
@@ -21,6 +22,7 @@ void Gracz3::reset() {
 	ruchy.clear();
 	poczatkowe_ruchy.clear();
 	moje_ruchy.clear();
+	moje_ruchy.push_back( Papier );
 }
 
 float Gracz3::win_ratio() {
@@ -91,7 +93,8 @@ Ruch Gracz3::statystyka( int ile ) {
 	};
 	float znaczna_dysproporcja_plus = 1.3;
 	float znaczna_dysproporcja_minus = 0.75;
-
+	
+	//
 	staty ja;
 
 	std::vector<Ruch> *wsk = &moje_ruchy;
@@ -102,7 +105,8 @@ Ruch Gracz3::statystyka( int ile ) {
 	ja.ile_Pap = std::count( it1, it2, 0 );
 	ja.ile_Noz = std::count( it1, it2, 1 );
 	ja.ile_Kam = std::count( it1, it2, 2 );
-
+	
+	//
 	staty on;
 
 	wsk = &ruchy;
@@ -114,7 +118,11 @@ Ruch Gracz3::statystyka( int ile ) {
 	on.ile_Noz = std::count( it1, it2, 1 );
 	on.ile_Kam = std::count( it1, it2, 2 );
 
+	//debug
+	std::cout << "ja, kam,noz,pap " << ja.ile_Kam << " " << ja.ile_Noz << " " << ja.ile_Pap <<  "  dla: " << ile << " numer limitera: " << limiter_szesciu << std::endl;
+	std::cout << "oa, kam,noz,pap " << on.ile_Kam << " " << on.ile_Noz << " " << on.ile_Pap << std::endl << std::endl;
 	//
+	
 	if( ja.ile_Kam>0 && ja.ile_Noz >0 && ja.ile_Pap > 0 && on.ile_Kam > 0 && on.ile_Noz >0 && on.ile_Pap > 0 ) {
 		if( (ja.ile_Noz / on.ile_Kam) >= znaczna_dysproporcja_minus )
 			return Papier;
@@ -173,9 +181,6 @@ void Gracz3::przedstawSie() {
 bool Gracz3::czy_wygralem( std::vector<Ruch> ja, std::vector<Ruch> on, int kiedy ) { //kiedy: od 0 licze
 	if( (kiedy >= ja.size()) || (kiedy >= on.size()) ) {
 		std::cerr << "blad: iterator out of range" << std::endl;
-	}
-	if( ja.size() != on.size() ) {
-		std::cerr << "tablice roznej wielkosci" << std::endl;
 	}
 
 	if( ja.at( kiedy ) == kontrator( on.at( kiedy ) ) )
@@ -379,27 +384,33 @@ int Gracz3::analizer_up( std::vector<Ruch> potyczki, int ile_ostatnich ) {
 Ruch Gracz3::ruch( Ruch stary_ruch ) {
 	Ruch _return;
 
-	if( limiter_szesciu >= 1 && limiter_szesciu < 9 ) {
+	//limiter 6 od 0
+	//numer podpuszczacza od 1
+
+	if( limiter_szesciu < 8 ) {
 		_return = podpuszczacz( numer_podpuszczacza );
 	}
 
 	//---------------------zapis danych
 
 	//---------------------zaczyna docelowy alg--------------------//
-	if( limiter_szesciu > 20 ) {
+	if( limiter_szesciu > 19 ) {
 		jego_okres.push_back( analizer_up( ruchy, 12 ) );
 		if( win_ratio() < 0.75 && kiedy_badanie > static_cast<int>(1000 /( kiedy_badanie + 1) && limiter_szesciu > 50 ) ) {
 			_return = podpuszczacz( numer_podpuszczacza );
 		}
 		else if( analizer_up( ruchy, 12 ) == -1 ) {//brak schematu
-			_return = kontrator( statystyka( limiter_szesciu - 20 ));
+			if( limiter_szesciu > 40 )
+				_return = kontrator( statystyka( limiter_szesciu ) );
+			else
+				_return = kontrator( statystyka( limiter_szesciu - 20 ) );
 		}
 		else if( analizer_up( ruchy, 12 ) > 0 ) {//jakis okres
 			_return = kontrator( jaki_ruch_okresu( ruchy, 12, analizer_up( ruchy, 12 ) ) );
 		}
 	}
-	else if( limiter_szesciu >8 && limiter_szesciu < 21) {
-		jego_okres.push_back( analizer_up( ruchy, 12 ) );
+	else if( limiter_szesciu > 7 && limiter_szesciu < 20) {
+		jego_okres.push_back( analizer_up( ruchy, ruchy.size() ) );
 		if( analizer_up( ruchy, ruchy.size() ) == -1 ) {
 			_return = statystyka( ruchy.size() );
 		}
@@ -408,7 +419,7 @@ Ruch Gracz3::ruch( Ruch stary_ruch ) {
 		}
 	}
 
-	if( limiter_szesciu > 3 ) {
+	
 		ruchy.push_back( stary_ruch );
 		moje_ruchy.push_back( _return );
 		if( limiter_szesciu > 4 ) {
@@ -421,7 +432,7 @@ Ruch Gracz3::ruch( Ruch stary_ruch ) {
 				wygr.wygrana_tab.push_back( 0 );
 			}
 		}
-	}
+	
 
 	limiter_szesciu++;
 	return _return;

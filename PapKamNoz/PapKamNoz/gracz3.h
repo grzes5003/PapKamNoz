@@ -15,7 +15,7 @@ class Gracz3 : public Gracz
 	Wygrana wygr;
 	float win_ratio();
 
-	int limiter_szesciu = 1;
+	int limiter_szesciu = 0;
 	bool inteligent = false;
 	bool zmienny_inteligent = false;
 
