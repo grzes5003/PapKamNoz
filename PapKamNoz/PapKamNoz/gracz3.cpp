@@ -390,6 +390,10 @@ Ruch Gracz3::ruch( Ruch stary_ruch ) {
 	if( limiter_szesciu < 8 ) {
 		_return = podpuszczacz( numer_podpuszczacza );
 	}
+	if( numer_podpuszczacza > 8 ) {
+		numer_podpuszczacza = 1;
+		kiedy_badanie = 0;
+	}
 
 	//---------------------zapis danych
 
@@ -398,12 +402,13 @@ Ruch Gracz3::ruch( Ruch stary_ruch ) {
 		jego_okres.push_back( analizer_up( ruchy, 12 ) );
 		if( win_ratio() < 0.75 && kiedy_badanie > static_cast<int>(1000 /( kiedy_badanie + 1) && limiter_szesciu > 50 ) ) {
 			_return = podpuszczacz( numer_podpuszczacza );
+			std::cout << "podpuszczacz" << std::endl;
 		}
 		else if( analizer_up( ruchy, 12 ) == -1 ) {//brak schematu
-			if( limiter_szesciu > 40 )
-				_return = kontrator( statystyka( limiter_szesciu ) );
+			if( limiter_szesciu > 50 )
+				_return = kontrator( statystyka( 45 ) );
 			else
-				_return = kontrator( statystyka( limiter_szesciu - 20 ) );
+				_return = kontrator( statystyka( limiter_szesciu-1 ) );
 		}
 		else if( analizer_up( ruchy, 12 ) > 0 ) {//jakis okres
 			_return = kontrator( jaki_ruch_okresu( ruchy, 12, analizer_up( ruchy, 12 ) ) );
@@ -433,7 +438,7 @@ Ruch Gracz3::ruch( Ruch stary_ruch ) {
 			}
 		}
 	
-
+		kiedy_badanie++;
 	limiter_szesciu++;
 	return _return;
 }
