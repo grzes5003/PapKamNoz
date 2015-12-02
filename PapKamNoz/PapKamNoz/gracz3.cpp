@@ -1,6 +1,6 @@
 #include "gracz3.h"
 
-Gracz3::Gracz3() {
+Gracz3::Gracz3() : _gen( _rd() ), _dis( 0, 2 ) {
 	moje_ruchy.push_back( Papier );
 		wygr.ja = 0;
 		wygr.on = 0;
@@ -30,8 +30,10 @@ float Gracz3::win_ratio() {
 	std::vector<int>::iterator it1 = wsk->begin();
 	std::vector<int>::iterator it2 = wsk->end();
 
-	int ja = std::count( it1, it2, 1 );
-	int on = std::count( it1, it2, 0 );
+	float ja = std::count( it1, it2, 1 );
+	float on = std::count( it1, it2, 0 );
+
+	//std::cout << "jaaa = " << ja << "   onnn = " << on << "  czylii = " << (ja / (on + ja)) <<std::endl;
 
 	return (ja / (on + ja));
 }
@@ -119,8 +121,8 @@ Ruch Gracz3::statystyka( int ile ) {
 	on.ile_Kam = std::count( it1, it2, 2 );
 
 	//debug
-	std::cout << "ja, kam,noz,pap " << ja.ile_Kam << " " << ja.ile_Noz << " " << ja.ile_Pap <<  "  dla: " << ile << " numer limitera: " << limiter_szesciu << std::endl;
-	std::cout << "oa, kam,noz,pap " << on.ile_Kam << " " << on.ile_Noz << " " << on.ile_Pap << std::endl << std::endl;
+	//std::cout << "ja, kam,noz,pap " << ja.ile_Kam << " " << ja.ile_Noz << " " << ja.ile_Pap <<  "  dla: " << ile << " numer limitera: " << limiter_szesciu << std::endl;
+	//std::cout << "oa, kam,noz,pap " << on.ile_Kam << " " << on.ile_Noz << " " << on.ile_Pap << std::endl << std::endl;
 	//
 	
 	if( ja.ile_Kam>0 && ja.ile_Noz >0 && ja.ile_Pap > 0 && on.ile_Kam > 0 && on.ile_Noz >0 && on.ile_Pap > 0 ) {
@@ -399,19 +401,23 @@ Ruch Gracz3::ruch( Ruch stary_ruch ) {
 
 	//---------------------zaczyna docelowy alg--------------------//
 	if( limiter_szesciu > 19 ) {
+		std::cout << win_ratio() << std::endl;
 		jego_okres.push_back( analizer_up( ruchy, 12 ) );
-		if( win_ratio() < 0.75 && kiedy_badanie > static_cast<int>(1000 /( kiedy_badanie + 1) && limiter_szesciu > 50 ) ) {
-			_return = podpuszczacz( numer_podpuszczacza );
-			std::cout << "podpuszczacz" << std::endl;
+		if( win_ratio() < 0.3 && limiter_szesciu > 40 ) {
+			_return = Ruch( _dis( _gen ) );;
 		}
-		else if( analizer_up( ruchy, 12 ) == -1 ) {//brak schematu
+		else if( win_ratio() < 0.75 && kiedy_badanie > static_cast<int>(1000 / (kiedy_badanie + 1) && limiter_szesciu > 50) ) {
+			_return = podpuszczacz( numer_podpuszczacza );
+			//std::cout << "podpuszczacz" << std::endl;
+		}
+		else if( analizer_up( ruchy, 8 ) == -1 ) {//brak schematu
 			if( limiter_szesciu > 50 )
 				_return = kontrator( statystyka( 45 ) );
 			else
 				_return = kontrator( statystyka( limiter_szesciu-1 ) );
 		}
-		else if( analizer_up( ruchy, 12 ) > 0 ) {//jakis okres
-			_return = kontrator( jaki_ruch_okresu( ruchy, 12, analizer_up( ruchy, 12 ) ) );
+		else if( analizer_up( ruchy, 8 ) > 0 ) {//jakis okres
+			_return = kontrator( jaki_ruch_okresu( ruchy, 8, analizer_up( ruchy, 8 ) ) );
 		}
 	}
 	else if( limiter_szesciu > 7 && limiter_szesciu < 20) {
@@ -438,7 +444,9 @@ Ruch Gracz3::ruch( Ruch stary_ruch ) {
 			}
 		}
 	
-		kiedy_badanie++;
+	
+
+	kiedy_badanie++;
 	limiter_szesciu++;
 	return _return;
 }

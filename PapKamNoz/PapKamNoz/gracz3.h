@@ -7,6 +7,12 @@
 class Gracz3 : public Gracz
 {
 
+	std::random_device _rd;
+	
+	std::mt19937 _gen;
+	
+	std::uniform_int_distribution<> _dis;
+	
 	struct Wygrana {
 		int ja;
 		int on;

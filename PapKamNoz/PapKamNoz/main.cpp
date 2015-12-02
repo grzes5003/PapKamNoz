@@ -21,76 +21,60 @@ class Gracz1 : public Gracz {
 //	void reset() {
 //
 //	}
-	int dawny = rand() % 3;
-	int bardzoDawny = rand() % 3;
-	int mojdawny = rand() % 3;
-	int lotto = rand() % 3;
-
+	int _licznik;
+	int _reset;
 public:
 	Gracz1() {
-		dawny;
-		bardzoDawny;
-		mojdawny;
-		lotto;
-
+		_licznik = 0;
+		_reset = 0;
 	}
-
 	virtual Ruch ruch( Ruch poprzedniRuchPrzeciwnika ) {
-		int bardzoDawny = dawny;
-		dawny = poprzedniRuchPrzeciwnika;
-		if( dawny == lotto ) {
-			mojdawny = rand() % 3;
-		}
-		if( dawny == 0 ) {
-			if( bardzoDawny == 0 ) {
-				mojdawny = 1;
-			}
-			else {
-				if( mojdawny == 2 )
-					mojdawny = 0;
-				if( mojdawny == 0 )
-					mojdawny = 2;
-				if( mojdawny == 1 )
-					mojdawny = 2;
-			}
-		}
-		if( dawny == 1 ) {
-			if( bardzoDawny == 1 ) {
-				mojdawny = 2;
-			}
-			else {
-				if( mojdawny == 2 )
-					mojdawny = 0;
-				if( mojdawny == 0 )
-					mojdawny = 1;
-				if( mojdawny == 1 )
-					mojdawny = 0;
-			}
-		}
-		if( dawny == 2 ) {
-			if( bardzoDawny == 2 ) {
-				mojdawny = 0;
-			}
-			else {
-				if( mojdawny == 2 )
-					mojdawny = 1;
-				if( mojdawny == 0 )
-					mojdawny = 1;
-				if( mojdawny == 1 )
-					mojdawny = 2;
-			}
-		}
-		lotto = rand() % 3;
-		return Ruch( mojdawny );
+		// nie chcialem castowac
 
-	}
-	void przedstawSie() {
-		std::cout << "Grzegorz Sarapata";
+		if( _reset == 0 ) {
+			if( _licznik == 0 ) {
+				_licznik = 2;
+				_reset++;
+				return Ruch::Papier;
+			}
+			if( _licznik == 1 ) {
+				_licznik = 0;
+				_reset++;
+				return Ruch::Nozyce;
+			}
+			if( _licznik == 2 );
+			_licznik = 1;
+			_reset++;
+			return Ruch::Kamien;
+		}
+		if( _reset == 1 ) {
+			if( _licznik == 0 || _licznik == 1 ) {
+				_licznik = 2;
+				_reset++;
+				return Ruch::Papier;
+			}
+			if( _licznik == 2 );
+			_licznik = 1;
+			_reset++;
+			return Ruch::Kamien;
+		}
+		if( _reset == 2 || _reset == 3 ) {
+			_reset++;
+			return Ruch::Papier;
+		}
+		if( _reset == 4 ) {
+			_reset = 0;
+			return Ruch::Kamien;
+		}
 	}
 	void reset() {
 
 	}
+	virtual void przedstawSie() {
+		std::cout << "Bartosz Pietrzyk";
+	}
 };
+
 
 
 
